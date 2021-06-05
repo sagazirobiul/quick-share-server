@@ -32,6 +32,13 @@ client.connect(err => {
             res.send(items)
         })
     })
+    
+    app.get('/updatePost/:id', (req, res) => {
+        postCollection.find({_id: ObjectId(req.params.id)})
+        .toArray((err, items) => {
+            res.send(items)
+        })
+    })
 
     app.delete('/delete/:id', (req, res) => {
         postCollection.deleteOne({_id: ObjectId(req.params.id)})
@@ -48,7 +55,6 @@ client.connect(err => {
     })
 
 });
-
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
