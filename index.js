@@ -20,25 +20,23 @@ client.connect(err => {
             res.send(result.insertedCount > 0)
         })
     })
-    app.get("/posts", (req, res) => {
-        postCollection.find({})
-        .toArray((err, items) => {
-            res.send(items)
+
+    const getData = (url, findObj = {}) => {
+        app.get(`/${url}`, (req, res) => {
+            if(findObj === 'email'){
+                findObj = {email: req.query.email};
+            }else if (findObj === 'query'){
+                findObj = {_id: ObjectId(req.params.id)};
+            }
+            postCollection.find(findObj)
+            .toArray((err, items) => {
+                res.send(items)
+            })
         })
-    })
-    app.get('/myPosts', (req, res) => {
-        postCollection.find({email: req.query.email})
-        .toArray((err, items) => {
-            res.send(items)
-        })
-    })
-    
-    app.get('/updatePost/:id', (req, res) => {
-        postCollection.find({_id: ObjectId(req.params.id)})
-        .toArray((err, items) => {
-            res.send(items)
-        })
-    })
+    }
+    getData('posts');
+    getData('myPosts', 'email');
+    getData('updatePost/:id', 'query');
 
     app.delete('/delete/:id', (req, res) => {
         postCollection.deleteOne({_id: ObjectId(req.params.id)})
@@ -59,5 +57,4 @@ client.connect(err => {
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
-
 app.listen(port)
