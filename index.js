@@ -1,5 +1,5 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
 const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
@@ -22,21 +22,19 @@ client.connect(err => {
     })
 
     const getData = (url, findObj = {}) => {
-        app.get(`/${url}`, (req, res) => {
-            if(findObj === 'email'){
-                findObj = {email: req.query.email};
-            }else if (findObj === 'query'){
-                findObj = {_id: ObjectId(req.params.id)};
-            }
-            postCollection.find(findObj)
+        app.get(url, (req, res) => {
+            postCollection.find(
+                findObj === 'email' ? {email: req.params.email}:
+                findObj === 'id'? {_id: ObjectId(req.params.id)}: null
+            )
             .toArray((err, items) => {
                 res.send(items)
             })
         })
     }
-    getData('posts');
-    getData('myPosts', 'email');
-    getData('updatePost/:id', 'query');
+    getData('/posts');
+    getData('/myPosts/:email', 'email');
+    getData('/updatePost/:id', 'id');
 
     app.delete('/delete/:id', (req, res) => {
         postCollection.deleteOne({_id: ObjectId(req.params.id)})
@@ -51,7 +49,6 @@ client.connect(err => {
             res.send(result.modifiedCount > 0)
         })
     })
-
 });
 
 app.get('/', (req, res) => {
